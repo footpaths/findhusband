@@ -203,6 +203,7 @@ class ScreenRecordingActivity : Activity() {
                     println(p0)
                     val fdelete = File(filePath)
                     fdelete.delete()
+                    
                 }
             })
 
