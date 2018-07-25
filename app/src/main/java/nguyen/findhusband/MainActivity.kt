@@ -29,14 +29,22 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.OnCompleteListener
 import android.R.attr.password
 import android.R.attr.password
+import android.app.Service.START_STICKY
+import android.content.Intent
 import android.util.Log
+import android.content.IntentFilter
+import android.hardware.display.VirtualDisplay
+import android.nfc.Tag
+import android.os.Build
+import android.os.CountDownTimer
+import androidx.annotation.RequiresApi
+import nguyen.ScreenPreference
 
 
 class MainActivity : AppCompatActivity() {
     val MULTIPLE_PERMISSIONS = 10 // code you want.
     var status = false
-    var outputFile = Environment.getExternalStorageDirectory().absolutePath + "/recording.3gp"
-    var myAudioRecorder: MediaRecorder? = MediaRecorder()
+
 
     var permissions = arrayOf<String>(Manifest.permission.PROCESS_OUTGOING_CALLS,
             Manifest.permission.CALL_PHONE,
@@ -46,15 +54,19 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.RECORD_AUDIO)
     private var mAuth: FirebaseAuth? = null
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         instance = this
         mAuth = FirebaseAuth.getInstance()
+
+        ScreenPreference.getInstance(this@MainActivity).saveDeviceID = "0"
+
         if (checkPermissions()) {
 
         }
-
+        startService(Intent(this@MainActivity, ScreenService::class.java))
 
         //  val p = packageManager
         // val componentName = ComponentName(this@MainActivity, nguyen.findhusband.MainActivity::class.java!!) // activity which is first time open in manifiest file which is declare as <category android:name="android.intent.category.LAUNCHER" />
@@ -78,7 +90,27 @@ class MainActivity : AppCompatActivity() {
 
                     // ...
                 }
-    }
+
+
+//        play.setOnClickListener {
+//            val mediaPlayer = MediaPlayer()
+//
+//            try {
+//                mediaPlayer.setDataSource(outputFile)
+//                mediaPlayer.prepare()
+//                mediaPlayer.start()
+//
+//                Toast.makeText(applicationContext, "Playing Audio", Toast.LENGTH_LONG).show()
+//
+//            } catch (e: Exception) {
+//                // make something
+//            }
+//        }
+
+
+     }
+
+
 
     private fun checkPermissions(): Boolean {
         var result: Int
@@ -123,7 +155,13 @@ class MainActivity : AppCompatActivity() {
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth!!.currentUser
         println(currentUser)
+
         //updateUI(currentUser)
     }
+
+    fun sCreenRecorder() {
+        Log.d("MainActivity","qua men" )
+    }
+
 
 }
