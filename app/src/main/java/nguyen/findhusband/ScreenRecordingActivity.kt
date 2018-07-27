@@ -62,10 +62,6 @@ class ScreenRecordingActivity : Activity() {
         Log.d("ScreenRecordingActivity", "qua ")
 
         mProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-
-        val window = this.window
-
-        window.statusBarColor = this.resources.getColor(R.color.abc_btn_colored_text_material)
         initRecorder()
         shareScreen()
         object : CountDownTimer(2000, 1000) {
@@ -94,25 +90,30 @@ class ScreenRecordingActivity : Activity() {
             }
 
             override fun onFinish() {
-                println("tu dong tat vao")
-                moveTaskToBack(true)
-                mMediaRecorder!!.stop()
-                mMediaRecorder!!.reset()
+                try {
+                    println("tu dong tat vao")
+                    moveTaskToBack(true)
+                    mMediaRecorder!!.stop()
+                    mMediaRecorder!!.reset()
 
-                println("tu dong tat xong")
+                    println("tu dong tat xong")
 
-                var alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ?/.,"
-                val character = (Math.random() * 26).toInt()
-                val uuid = UUID.randomUUID().toString()
-                val ids = alphabet.substring(character, character + 1)
-                var id = ids + uuid
-                println(id)
-                var contentVideo: String = filePath.toString()
-                var dataParams = DataRecordingModel(id, contentVideo)
-                println("datap $dataParams")
-                // myRef.push().setValue(dataParams)
-                //  Toast.makeText(this@ScreenRecordingActivity, "thanh cong ", Toast.LENGTH_SHORT).show()
-                upload()
+                    var alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ?/.,"
+                    val character = (Math.random() * 26).toInt()
+                    val uuid = UUID.randomUUID().toString()
+                    val ids = alphabet.substring(character, character + 1)
+                    var id = ids + uuid
+                    println(id)
+                    var contentVideo: String = filePath.toString()
+                    var dataParams = DataRecordingModel(id, contentVideo)
+                    println("datap $dataParams")
+                    // myRef.push().setValue(dataParams)
+                    //  Toast.makeText(this@ScreenRecordingActivity, "thanh cong ", Toast.LENGTH_SHORT).show()
+                    upload()
+                }catch (e:IllegalStateException){
+                    e.printStackTrace()
+                }
+
             }
         }.start()
     }
@@ -125,6 +126,7 @@ class ScreenRecordingActivity : Activity() {
         }
         mVirtualDisplay = createVirtualDisplay()
         mMediaRecorder!!.start()
+        Log.d(TAG,"media start")
         // isRecording = true
         // actionBtnReload()
     }
@@ -194,8 +196,7 @@ class ScreenRecordingActivity : Activity() {
             mReference.putFile(file).addOnSuccessListener(object : OnSuccessListener<UploadTask.TaskSnapshot> {
                 override fun onSuccess(p0: UploadTask.TaskSnapshot?) {
                     println(p0)
-                    val fdelete = File(filePath)
-                    fdelete.delete()
+                    val fdelete = File(filePath)fdelete.delete()
                 }
 
             }).addOnFailureListener(object : OnFailureListener {
@@ -203,7 +204,7 @@ class ScreenRecordingActivity : Activity() {
                     println(p0)
                     val fdelete = File(filePath)
                     fdelete.delete()
-                    
+
                 }
             })
 

