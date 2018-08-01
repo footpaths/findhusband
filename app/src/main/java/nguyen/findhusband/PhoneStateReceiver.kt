@@ -77,14 +77,32 @@ class PhoneStateReceiver : BroadcastReceiver() {
             val action = intent.action
             var database = FirebaseDatabase.getInstance()
             myRef = database.getReference("message")
-
             if (ScreenPreference.getInstance(context).saveDeviceID == "0") {
                 if (Intent.ACTION_SCREEN_ON == action) {
 
-                    Log.d(TAG, "screen is on...")
+                    Log.d(TAG, "screen is on 1...")
 
                 } else if (Intent.ACTION_SCREEN_OFF == action) {
-                    Log.d(TAG, "screen is off...")
+                    Log.d(TAG, "screen is off 1...")
+
+                    if (ScreenRecordingActivity.instance.mMediaRecorder != null) {
+
+                        if (ScreenPreference.getInstance(context).saveStatus == "true") {
+                            try {
+                                Log.d(TAG, "bat dau stop...")
+                                ScreenRecordingActivity.instance.mMediaRecorder!!.stop()
+                                ScreenRecordingActivity.instance.mMediaRecorder!!.reset()
+                                Log.d(TAG, "da stop...")
+                                ScreenPreference.getInstance(context).saveStatus = "false"
+                                ScreenRecordingActivity.instance.upload()
+                                ScreenRecordingActivity.instance.stopCountTimer()
+                            }catch (e:IllegalStateException){
+                                e.printStackTrace()
+                            }
+
+                        }
+
+                    }
 
                 } else if (Intent.ACTION_USER_PRESENT == action) {
 
@@ -97,30 +115,33 @@ class PhoneStateReceiver : BroadcastReceiver() {
             } else {
                 if (Intent.ACTION_SCREEN_ON == action) {
 
-                    Log.d(TAG, "screen is on...")
+                    Log.d(TAG, "screen is on.2..")
 
 
                 } else if (Intent.ACTION_SCREEN_OFF == action) {
+
                     if (ScreenRecordingActivity.instance.mMediaRecorder != null) {
 
-                        ScreenRecordingActivity.instance.mMediaRecorder!!.stop()
-                        ScreenRecordingActivity.instance.mMediaRecorder!!.reset()
+                        if (ScreenPreference.getInstance(context).saveStatus == "true") {
+                            try {
+                                Log.d(TAG, "bat dau stop...")
+                                ScreenRecordingActivity.instance.mMediaRecorder!!.stop()
+                                ScreenRecordingActivity.instance.mMediaRecorder!!.reset()
+                                Log.d(TAG, "da stop...")
+                                ScreenPreference.getInstance(context).saveStatus = "false"
+                                ScreenRecordingActivity.instance.upload()
+                                ScreenRecordingActivity.instance.stopCountTimer()
+                            }catch (e:IllegalStateException){
+                                e.printStackTrace()
+                            }
+
+                        }
+
                     }
                 } else if (Intent.ACTION_USER_PRESENT == action) {
                     context.startService(Intent(context, ScreenService::class.java))
-
+                    Log.d(TAG, "screen is unlock... 2")
                     checkOnOff()
-
-
-                    /* Log.d(TAG, "screen is unlock...")
-                     var inten = Intent(mContext, ScreenRecordingActivity::class.java)
-                     inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                     inten.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                     ScreenPreference.getInstance(context).orderID = "true"
-
-                     mContext!!.startActivity(inten)
-                     context.startService(Intent(context, ScreenService::class.java))*/
-
                 }
             }
 
@@ -195,7 +216,7 @@ class PhoneStateReceiver : BroadcastReceiver() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val value = dataSnapshot.getValue(String::class.java)
                 Log.d(TAG, "Value is: $value")
-                    if (value!!.contains("true")) {
+                if (value!!.contains("true")) {
 
                     Log.d(TAG, "screen is unlock...")
                     var inten = Intent(mContext, ScreenRecordingActivity::class.java)
@@ -209,9 +230,6 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
     }
 
-    fun test() {
-        Log.d(TAG, "hehhhhhhhhhhhhhhhhhhhhh")
-    }
 
 }
 

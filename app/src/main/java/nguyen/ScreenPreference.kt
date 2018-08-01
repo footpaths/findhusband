@@ -76,7 +76,7 @@ class ScreenPreference (private val context: Context) {
         }
 
 
-    var saveName: String
+    var saveStatus: String
 
         get() = sharedPreferences.getString("name", "")
 

