@@ -1,5 +1,6 @@
 package nguyen.findhusband
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -30,6 +31,7 @@ import com.google.firebase.storage.UploadTask
 import kotlinx.android.synthetic.main.activity_screen_recording.*
 import nguyen.ScreenPreference
 import nguyen.findhusband.model.DataRecordingModel
+import nguyen.findhusband.model.Upload
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -47,17 +49,20 @@ class ScreenRecordingActivity : Activity() {
     private lateinit var myRef: DatabaseReference
     var mStorage: StorageReference? = null
     var timer: CountDownTimer? = null
+    private var mDatabase: DatabaseReference? = null
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // setContentView(R.layout.activity_screen_recording)
         val database = FirebaseDatabase.getInstance()
-        mStorage = FirebaseStorage.getInstance().getReference("Uploads")
+        mStorage = FirebaseStorage.getInstance().getReference(Constants.STORAGE_PATH_UPLOADS)
         instance = this
         val metrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(metrics)
         mScreenDensity = metrics.densityDpi
         ScreenPreference.getInstance(this@ScreenRecordingActivity).saveStatus = "true"
+        mDatabase = FirebaseDatabase.getInstance().getReference(Constants.DATABASE_PATH_UPLOADS)
 
         mMediaRecorder = MediaRecorder()
         Log.d("ScreenRecordingActivity", "qua ")
@@ -192,12 +197,19 @@ class ScreenRecordingActivity : Activity() {
 
         val file = Uri.fromFile(File(filePath))
         var mReference = mStorage!!.child(file.lastPathSegment)
+
         println(file.lastPathSegment)
         try {
 
             mReference.putFile(file).addOnSuccessListener(object : OnSuccessListener<UploadTask.TaskSnapshot> {
-                override fun onSuccess(p0: UploadTask.TaskSnapshot?) {
-                    println(p0)
+                @SuppressLint("VisibleForTests")
+                override fun onSuccess(taskSnapshot: UploadTask.TaskSnapshot?) {
+                    println(taskSnapshot)
+
+                    val upload = Upload(getCurSysDate(),taskSnapshot!!.downloadUrl!!.toString())
+                    val uploadId = mDatabase!!.push().key
+                    mDatabase!!.child(uploadId!!).setValue(upload)
+
                     val fdelete = File(filePath)
                     fdelete.delete()
                 }
